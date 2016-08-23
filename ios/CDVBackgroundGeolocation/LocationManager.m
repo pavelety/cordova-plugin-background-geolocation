@@ -530,10 +530,10 @@ enum {
             continue;
         }
 
-        if ([bgloc isBetterLocation:lastLocation]) {
-            DDLogInfo(@"Better location found: %@", bgloc);
+        //if ([bgloc isBetterLocation:lastLocation]) {
+        //    DDLogInfo(@"Better location found: %@", bgloc);
             lastLocation = bgloc;
-        }
+        //}
     }
 
     if (lastLocation == nil) {
