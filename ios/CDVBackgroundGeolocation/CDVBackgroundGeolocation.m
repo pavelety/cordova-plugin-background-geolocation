@@ -261,7 +261,7 @@
 -(void) onPause:(NSNotification *)notification
 {
     DDLogDebug(@"CDVBackgroundGeoLocation paused");
-    [manager switchMode:BACKGROUND];
+    //[manager switchMode:BACKGROUND];
 }
 
 /**@
