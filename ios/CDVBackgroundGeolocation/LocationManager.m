@@ -287,10 +287,10 @@ enum {
     aquireStartTime = [NSDate date];
 
     // Crank up the GPS power temporarily to get a good fix on our current location
-    [self stopUpdatingLocation];
+    //[self stopUpdatingLocation];
     locationManager.distanceFilter = kCLDistanceFilterNone;
     locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation;
-    [self startUpdatingLocation];
+    //[self startUpdatingLocation];
 }
 
 - (BOOL) isLocationEnabled
