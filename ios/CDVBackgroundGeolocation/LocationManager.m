@@ -290,7 +290,7 @@ enum {
     //[self stopUpdatingLocation];
     locationManager.distanceFilter = kCLDistanceFilterNone;
     locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation;
-    //[self startUpdatingLocation];
+    [self startUpdatingLocation];
 }
 
 - (BOOL) isLocationEnabled
