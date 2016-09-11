@@ -255,13 +255,13 @@
 -(void) onResume:(NSNotification *)notification
 {
     DDLogDebug(@"CDVBackgroundGeoLocation resumed");
-    [manager switchMode:FOREGROUND];
+    //[manager switchMode:FOREGROUND];
 }
 
 -(void) onPause:(NSNotification *)notification
 {
     DDLogDebug(@"CDVBackgroundGeoLocation paused");
-    [manager switchMode:BACKGROUND];
+    //[manager switchMode:BACKGROUND];
 }
 
 /**@
