@@ -261,7 +261,7 @@
 -(void) onPause:(NSNotification *)notification
 {
     DDLogDebug(@"CDVBackgroundGeoLocation paused");
-    //[manager switchMode:BACKGROUND];
+    [manager switchMode:BACKGROUND];
 }
 
 /**@
@@ -273,7 +273,7 @@
     
     if ([dict objectForKey:UIApplicationLaunchOptionsLocationKey]) {
         DDLogInfo(@"CDVBackgroundGeolocation started by system on location event.");
-//        [manager switchOperationMode:BACKGROUND];
+        [manager switchOperationMode:BACKGROUND];
     }
 }
 
