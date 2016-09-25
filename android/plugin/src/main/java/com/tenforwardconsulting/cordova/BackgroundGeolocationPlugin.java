@@ -563,13 +563,17 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
+//    @TargetApi(Build.VERSION_CODES.KITKAT)
     private Intent registerLocationModeChangeReceiver (CallbackContext callbackContext) {
         if (locationModeChangeCallbackContext != null) {
             unregisterLocationModeChangeReceiver();
         }
         locationModeChangeCallbackContext = callbackContext;
-        return getContext().registerReceiver(locationModeChangeReceiver, new IntentFilter(LocationManager.MODE_CHANGED_ACTION));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            return getContext().registerReceiver(locationModeChangeReceiver, new IntentFilter(LocationManager.MODE_CHANGED_ACTION));
+        } else {
+            return getContext().registerReceiver(locationModeChangeReceiver, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
+        }
     }
 
     private void unregisterLocationModeChangeReceiver () {
