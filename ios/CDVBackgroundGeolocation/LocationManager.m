@@ -518,6 +518,13 @@ enum {
         Location *bgloc = [Location fromCLLocation:location];
         bgloc.type = @"current";
 
+        //fill if nil. any location better then nothing
+        if (lastLocation == nil) {
+            DDLogInfo(@"Location found (was nil): %@", bgloc);
+            lastLocation = bgloc;
+            continue;
+        }
+
         // test the age of the location measurement to determine if the measurement is cached
         // in most cases you will not want to rely on cached measurements
         DDLogDebug(@"Location age %f", [bgloc locationAge]);
@@ -525,13 +532,14 @@ enum {
             continue;
         }
 
-        if (lastLocation == nil) {
-            lastLocation = bgloc;
-            continue;
-        }
+        //if (lastLocation == nil) {
+        //    lastLocation = bgloc;
+        //    continue;
+        //}
 
         //if ([bgloc isBetterLocation:lastLocation]) {
         //    DDLogInfo(@"Better location found: %@", bgloc);
+            DDLogInfo(@"Location found: %@", bgloc);
             lastLocation = bgloc;
         //}
     }
