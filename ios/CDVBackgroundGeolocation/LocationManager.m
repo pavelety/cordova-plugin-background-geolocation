@@ -581,6 +581,8 @@ enum {
         } else if (-[aquireStartTime timeIntervalSinceNow] < maxLocationWaitTimeInSeconds) {
             // we still have time to aquire better location
             DDLogDebug(@"isAcquiringSpeed we still have time to aquire better location");
+            DDLogInfo(@"timeIntervalSinceNow : %f", -[aquireStartTime timeIntervalSinceNow]);
+            DDLogInfo(@"maxLocationWaitTimeInSeconds : %d", maxLocationWaitTimeInSeconds);
             return;
         }
 
