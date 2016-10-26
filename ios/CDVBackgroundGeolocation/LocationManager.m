@@ -578,13 +578,14 @@ enum {
 
         if ([lastLocation.accuracy doubleValue] <= [[NSNumber numberWithInteger:_config.desiredAccuracy] doubleValue]) {
             DDLogDebug(@"LocationManager found most accurate location before timeout");
-        } else if (-[aquireStartTime timeIntervalSinceNow] < maxLocationWaitTimeInSeconds) {
-            // we still have time to aquire better location
-            DDLogDebug(@"isAcquiringSpeed we still have time to aquire better location");
-            DDLogInfo(@"timeIntervalSinceNow : %f", -[aquireStartTime timeIntervalSinceNow]);
-            DDLogInfo(@"maxLocationWaitTimeInSeconds : %d", maxLocationWaitTimeInSeconds);
-            return;
         }
+         //else if (-[aquireStartTime timeIntervalSinceNow] < maxLocationWaitTimeInSeconds) {
+            // we still have time to aquire better location
+         //   DDLogDebug(@"isAcquiringSpeed we still have time to aquire better location");
+         //   DDLogInfo(@"timeIntervalSinceNow : %f", -[aquireStartTime timeIntervalSinceNow]);
+         //   DDLogInfo(@"maxLocationWaitTimeInSeconds : %d", maxLocationWaitTimeInSeconds);
+         //   return;
+        //}
 
         if (_config.isDebugging) {
             [self notify:@"Aggressive monitoring engaged"];
