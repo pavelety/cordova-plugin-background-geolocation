@@ -572,8 +572,8 @@ enum {
         [self queue:stationaryLocation];
     } else if (isAcquiringSpeed) {
         DDLogInfo(@"isAcquiringSpeed=true : %@", lastLocation.accuracy);
-        DDLogInfo(@"timeIntervalSinceNow : %@", -[aquireStartTime timeIntervalSinceNow]);
-        DDLogInfo(@"maxLocationWaitTimeInSeconds : %@", maxLocationWaitTimeInSeconds);
+        DDLogInfo(@"timeIntervalSinceNow : %f", -[aquireStartTime timeIntervalSinceNow]);
+        DDLogInfo(@"maxLocationWaitTimeInSeconds : %d", maxLocationWaitTimeInSeconds);
         if (_config.isDebugging) {
             AudioServicesPlaySystemSound (acquiringLocationSound);
         }
@@ -582,7 +582,7 @@ enum {
             DDLogDebug(@"LocationManager found most accurate location before timeout");
         } else if (-[aquireStartTime timeIntervalSinceNow] < maxLocationWaitTimeInSeconds) {
             // we still have time to aquire better location
-            DDLogInfo(@"we still have time to aquire better location : %@", -[aquireStartTime timeIntervalSinceNow] < maxLocationWaitTimeInSeconds);
+            DDLogInfo(@"isAcquiringSpeed we still have time to aquire better location");
             return;
         }
 
