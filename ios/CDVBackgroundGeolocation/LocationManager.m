@@ -571,9 +571,7 @@ enum {
         // fire onStationary @event for Javascript.
         [self queue:stationaryLocation];
     } else if (isAcquiringSpeed) {
-        DDLogInfo(@"isAcquiringSpeed=true : %@", lastLocation.accuracy);
-        DDLogInfo(@"timeIntervalSinceNow : %f", -[aquireStartTime timeIntervalSinceNow]);
-        DDLogInfo(@"maxLocationWaitTimeInSeconds : %d", maxLocationWaitTimeInSeconds);
+        DDLogInfo(@"isAcquiringSpeed=true");
         if (_config.isDebugging) {
             AudioServicesPlaySystemSound (acquiringLocationSound);
         }
