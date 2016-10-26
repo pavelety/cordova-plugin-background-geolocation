@@ -571,7 +571,7 @@ enum {
         // fire onStationary @event for Javascript.
         [self queue:stationaryLocation];
     } else if (isAcquiringSpeed) {
-        DDLogInfo(@"isAcquiringSpeed=true");
+        DDLogDebug(@"isAcquiringSpeed=true");
         if (_config.isDebugging) {
             AudioServicesPlaySystemSound (acquiringLocationSound);
         }
@@ -580,7 +580,7 @@ enum {
             DDLogDebug(@"LocationManager found most accurate location before timeout");
         } else if (-[aquireStartTime timeIntervalSinceNow] < maxLocationWaitTimeInSeconds) {
             // we still have time to aquire better location
-            DDLogInfo(@"isAcquiringSpeed we still have time to aquire better location");
+            DDLogDebug(@"isAcquiringSpeed we still have time to aquire better location");
             return;
         }
 
