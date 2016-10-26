@@ -41,8 +41,8 @@
 static NSString * const Domain = @"com.marianhello";
 
 enum {
-    maxLocationWaitTimeInSeconds = 15,
-    maxLocationAgeInSeconds = 30
+    maxLocationWaitTimeInSeconds = 1,
+    maxLocationAgeInSeconds = 60
 };
 
 @interface LocationManager () <CLLocationManagerDelegate>
