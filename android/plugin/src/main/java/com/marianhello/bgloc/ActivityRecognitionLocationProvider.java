@@ -64,12 +64,12 @@ public class ActivityRecognitionLocationProvider extends AbstractLocationProvide
     @Override
     public void onLocationChanged(Location location) {
         log.debug("Location change: {}", location.toString());
-
-        if (lastActivity.getType() == DetectedActivity.STILL) {
-            handleStationary(location);
-            stopTracking();
-            return;
-        }
+//removed because it prevent first location to send in JS
+//        if (lastActivity.getType() == DetectedActivity.STILL) {
+//            handleStationary(location);
+//            stopTracking();
+//            return;
+//        }
 
         if (config.isDebugging()) {
             Toast.makeText(locationService, "acy:" + location.getAccuracy() + ",v:" + location.getSpeed() + ",df:" + config.getDistanceFilter(), Toast.LENGTH_LONG).show();
