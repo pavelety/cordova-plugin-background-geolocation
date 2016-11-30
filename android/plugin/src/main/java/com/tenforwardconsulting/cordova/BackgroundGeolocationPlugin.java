@@ -601,7 +601,6 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     public static boolean isLocationEnabled(Context context) throws SettingNotFoundException {
         int locationMode;
 //        String locationProviders;
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             locationMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE);
             return locationMode != Settings.Secure.LOCATION_MODE_OFF;
@@ -609,7 +608,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
             LocationManager locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
 //            locationProviders = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
 //            return !TextUtils.isEmpty(locationProviders);
-            return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         }
     }
 
