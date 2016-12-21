@@ -142,6 +142,7 @@ enum {
  * @param {BOOL} stopOnTerminate
  * @param {NSString*} url
  * @param {NSMutableDictionary*} httpHeaders
+ * @param {BOOL} pauseLocationUpdates
  */
 - (BOOL) configure:(Config*)config error:(NSError * __autoreleasing *)outError
 {
@@ -150,7 +151,7 @@ enum {
 
     DDLogDebug(@"%@", config);
 
-    locationManager.pausesLocationUpdatesAutomatically = YES;
+    locationManager.pausesLocationUpdatesAutomatically = _config.pauseLocationUpdates;
     locationManager.activityType = [_config decodeActivityType];
     locationManager.distanceFilter = _config.distanceFilter; // meters
     locationManager.desiredAccuracy = [_config decodeDesiredAccuracy];
@@ -163,7 +164,7 @@ enum {
         }
     }
 
-    if (_config.syncUrl != nil) {
+    if ([config hasSyncUrl] && uploader == nil) {
         uploader = [[LocationUploader alloc] init];
     }
 
@@ -373,7 +374,10 @@ enum {
     SQLiteLocationDAO* locationDAO = [SQLiteLocationDAO sharedInstance];
     location.id = [locationDAO persistLocation:location limitRows:_config.maxLocations];
 
-    [locationQueue addObject:location];
+    @synchronized(self) {
+        [locationQueue addObject:location];
+    }
+
     [self flushQueue];
 }
 
@@ -397,9 +401,16 @@ enum {
 
     // Create a background-task and delegate to Javascript for syncing location
     bgTask = [self createBackgroundTask];
-    // retrieve first queued location
-    Location *location = [locationQueue firstObject];
-    [locationQueue removeObject:location];
+
+    Location *location = nil;
+    @synchronized(self) {
+        if ([locationQueue count] > 0) {
+            // retrieve first queued location
+            location = [locationQueue firstObject];
+            [locationQueue removeObject:location];
+        }
+    }
+    if (location == nil) return;
 
     [self sync:location];
 

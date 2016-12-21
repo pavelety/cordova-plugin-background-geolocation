@@ -4,26 +4,31 @@
 
 Cross-platform geolocation for Cordova / PhoneGap with battery-saving "circular region monitoring" and "stop detection".
 
-Plugin is both foreground and background geolocation service. It is far more battery and data efficient then html5 geolocation or cordova-geolocation plugin. But it can be used together with other geolocation providers (eg. html5 navigator.geolocation).
+Plugin can be used for geolocation when app is running in foreground or background. It is more battery and data efficient then html5 geolocation or cordova-geolocation plugin. It can be used side by side with other geolocation providers (eg. html5 navigator.geolocation).
 
 On Android you can choose from two location location providers:
 * **ANDROID_DISTANCE_FILTER_PROVIDER** (forked from [cordova-plugin-background-geolocation](https://github.com/christocracy/cordova-plugin-background-geolocation))
 * **ANDROID_ACTIVITY_PROVIDER**
 
-See wiki [Which provider should I use?](https://github.com/mauron85/cordova-plugin-background-geolocation/blob/master/PROVIDERS.md) for more information about providers.
+See [Which provider should I use?](https://github.com/mauron85/cordova-plugin-background-geolocation/blob/master/PROVIDERS.md) for more information about providers.
+
+## Example Application
+
+Checkout repository [cordova-plugin-background-geolocation-example](https://github.com/mauron85/cordova-plugin-background-geolocation-example).
 
 ## Submitting issues
 
-All new issues should follow instructions in [ISSUE_TEMPLATE.md](https://raw.githubusercontent.com/mauron85/cordova-plugin-background-geolocation/master/ISSUE_TEMPLATE.md). Properly filled issue report will significantly reduce number of follow up questions and decrease issue resolve time.
+All new issues should follow instructions in [ISSUE_TEMPLATE.md](https://raw.githubusercontent.com/mauron85/cordova-plugin-background-geolocation/master/ISSUE_TEMPLATE.md).
+Properly filled issue report will significantly reduce number of follow up questions and decrease issue resolving time.
+Most issues cannot be resolved without debug logs. Please try to isolate debug lines related to your issue.
+Instructions how to prepare debug logs can be found in section [Debugging](#debugging).
+If you're reporting app crash, debug logs might not contain all needed informations about the cause of the crash.
+In that case, also provide relevant parts of output of `adb logcat` command.
 
 ## Semantic Versioning
 This plugin is following semantic versioning as defined http://semver.org
 
 ## Migration to 2.0
-
-Warning: `option.url` for posting locations is very experimental and missing features like remote
-server synchronization. Location database can get very big as currently there is no cleaning mechanism.
-Use it at own risk. Proper server synchronization will be implemented in version 3.0.
 
 As version 2.0 platform support for Windows Phone 8 was removed.
 Some incompatible changes were introduced:
@@ -78,6 +83,10 @@ You will need to ensure that you have installed the following items through the 
 | Google Repository          | 24      |
 
 
+#### Backwards Compatibility
+Please note that as of Cordova Android 6.0.0 icons are by default in mipmap/ directory not drawable/ directory, so this plugin will have a build issue on < 6.0.0 Cordova builds, you will need to update Authenticator.xml to drawable directory from mipmap directory to work on older versions.
+
+
 ## Quick Example
 
 ```javascript
@@ -122,10 +131,6 @@ function onDeviceReady () {
 }
 ```
 
-## Example Application
-
-Checkout repository [cordova-plugin-background-geolocation-example](https://github.com/mauron85/cordova-plugin-background-geolocation-example).
-
 ## API
 
 ### configure(success, fail, options)
@@ -153,8 +158,9 @@ Configure options:
 | `notificationIconColor`   | `String` optional | Android      | The accent color to use for notification. Eg. **#4CAF50**.                                                                                                                                                                                                                                                                                         |
 | `notificationIconLarge`   | `String` optional | Android      | The filename of a custom notification icon. See android quirks.                                                                                                                                                                                                                                                                                    |
 | `notificationIconSmall`   | `String` optional | Android      | The filename of a custom notification icon. See android quirks.                                                                                                                                                                                                                                                                                    |
-| `locationProvider`        | `Number`          | Android      | Set location provider **@see** [wiki](https://github.com/mauron85/cordova-plugin-background-geolocation/wiki/Android-providers)                                                                                                                                                                                                                    |
+| `locationProvider`        | `Number`          | Android      | Set location provider **@see** [PROVIDERS.md](https://github.com/mauron85/cordova-plugin-background-geolocation/blob/master/PROVIDERS.md)                                                                                                                                                                                                          |
 | `activityType`            | `String`          | iOS          | [AutomotiveNavigation, OtherNavigation, Fitness, Other] Presumably, this affects iOS GPS algorithm. **@see** [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information |
+| `pauseLocationUpdates`    | `Boolean`         | iOS          | Pauses location updates when app is paused (default: true)                                                                                                                                                                                                                                                                                         |
 | `url`                     | `String`          | all          | Server url where to send HTTP POST with recorded locations **@see** [HTTP locations posting](#http-locations-posting)                                                                                                                                                                                                                              |
 | `syncUrl`                 | `String`          | all          | Server url where to send fail to post locations **@see** [HTTP locations posting](#http-locations-posting)                                                                                                                                                                                                                                         |
 | `syncThreshold`           | `Number`          | all          | Specifies how many previously failed locations will be sent to server at once (default: 100)                                                                                                                                                                                                                                                       |
@@ -214,7 +220,7 @@ Platform: Android >= 6, iOS >= 8.0
 Show app settings to allow change of app location permissions.
 
 ### showLocationSettings()
-Platform: iOS, Android
+Platform: iOS < 10.0, Android
 
 Show system settings to allow configuration of current location sources.
 
@@ -297,6 +303,12 @@ backgroundGeolocation.switchMode(backgroundGeolocation.mode.FOREGROUND);
 // switch to BACKGROUND mode
 backgroundGeolocation.switchMode(backgroundGeolocation.mode.BACKGROUND);
 ```
+### getLogEntries(limit, success, fail)
+Platform: iOS, Android
+
+Return all logged events. Useful for plugin debugging.
+Parameter `limit` limits number of returned entries.
+**@see [Debugging](#debugging)** for more information.
 
 ## Real world example
 
@@ -377,6 +389,8 @@ When only `option.syncUrl` is defined. Locations are send only in single batch, 
 
 Request body of posted locations is always array, even when only one location is sent.
 
+Warning: `option.maxLocations` has to be larger than `option.syncTreshold`. It's recommended to be 2x larger. In other case location syncing might not work properly.
+
 ### Example of express (nodejs) server
 ```javascript
 var express    = require('express');
@@ -410,9 +424,7 @@ Since the plugin uses **iOS** significant-changes API, the plugin cannot detect 
 
 ### Android
 
-Android **WILL** execute your configured ```callbackFn```. This is the main difference from original christocracy plugin.
-
-On Android devices it is required to have a notification in the drawer because it's a "foreground service".  This gives it high priority, decreasing probability of OS killing it. Check [wiki](https://github.com/mauron85/cordova-plugin-background-geolocation/wiki/Android-implementation) for explanation.
+On Android devices it is recommended to have a notification in the drawer (option `startForeground:true`). This gives plugin location service higher priority, decreasing probability of OS killing it. Check [wiki](https://github.com/mauron85/cordova-plugin-background-geolocation/wiki/Android-implementation) for explanation.
 
 #### Custom ROMs
 
@@ -501,7 +513,7 @@ function printLogs(logEntries, logFormatter, COLORS, MAX_LINES) {
 }
 
 function printAndroidLogs(logEntries) {
-  var COLORS = Array(5);
+  var COLORS = Object();
   COLORS['ERROR'] = 'background:white;color:red';
   COLORS['WARN'] = 'background:black;color:yellow';
   COLORS['INFO'] = 'background:white;color:blue';
@@ -519,7 +531,7 @@ function printAndroidLogs(logEntries) {
 }
 
 function printIosLogs(logEntries) {
-  var COLORS = Array(5);
+  var COLORS = Array();
   COLORS[1] = 'background:white;color:red';
   COLORS[2] = 'background:black;color:yellow';
   COLORS[4] = 'background:white;color:blue';

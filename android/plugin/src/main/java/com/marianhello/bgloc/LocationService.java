@@ -17,7 +17,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.database.SQLException;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -41,7 +40,6 @@ import com.marianhello.bgloc.data.DAOFactory;
 import com.marianhello.bgloc.data.LocationDAO;
 import com.marianhello.bgloc.sync.AccountHelper;
 import com.marianhello.bgloc.sync.AuthenticatorService;
-import com.marianhello.bgloc.sync.BatchManager;
 import com.marianhello.bgloc.sync.SyncService;
 import com.marianhello.logging.LoggerManager;
 
@@ -111,7 +109,6 @@ public class LocationService extends Service {
     private LocationProvider provider;
     private Account syncAccount;
     private Boolean hasConnectivity = true;
-    private BackgroundLocation lastLocation;
 
     private org.slf4j.Logger log;
 
@@ -327,15 +324,6 @@ public class LocationService extends Service {
     public void handleLocation(BackgroundLocation location) {
         log.debug("New location {}", location.toString());
 
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-//            // we do check only of API level >= 17 because in lower version it does more harm than good
-//            if (location.isBetterLocationThan(lastLocation) == false) {
-//                log.debug("Previous location: [{} acc={} t={}] is better than current",
-//                        lastLocation.getProvider(), lastLocation.getAccuracy(), lastLocation.getTime());
-//                return;
-//            }
-//        }
-
         location.setBatchStartMillis(System.currentTimeMillis() + ONE_MINUTE); // prevent sync of not yet posted location
         persistLocation(location);
 
@@ -358,8 +346,6 @@ public class LocationService extends Service {
         msg.setData(bundle);
 
         sendClientMessage(msg);
-
-        lastLocation = location;
     }
 
     public void handleStationary(BackgroundLocation location) {
