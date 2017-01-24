@@ -3,7 +3,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-plugin-mauron85-background-geolocation"
-        version="2.2.0-alpha.6">
+        version="2.2.5">
     <name>CDVBackgroundGeolocation</name>
     <description>Cordova Background Geolocation Plugin</description>
     <license>Apache-2.0</license>
@@ -19,6 +19,12 @@
 
     <!-- android -->
     <platform name="android">
+        <preference name="ICON" default="@mipmap/icon" />
+        <preference name="SMALL_ICON" default="@mipmap/icon" />
+        <preference name="ACCOUNT_LABEL" default="@string/app_name" />
+        <preference name="ACCOUNT_TYPE" default="$PACKAGE_NAME.account" />
+        <preference name="CONTENT_AUTHORITY" default="$PACKAGE_NAME" />
+
         <framework src="android/logtofile.gradle" custom="true" type="gradleReference"/>
         <framework src="com.google.android.gms:play-services-location:+" />
         <framework src="com.android.support:support-v4:+" />
@@ -65,41 +71,41 @@
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
             <service
-                android:name="com.marianhello.bgloc.sync.SyncService"
-                android:exported="true"
-                android:process=":sync">
+                    android:name="com.marianhello.bgloc.sync.SyncService"
+                    android:exported="true"
+                    android:process=":sync">
                 <intent-filter>
                     <action android:name="android.content.SyncAdapter"/>
                 </intent-filter>
                 <meta-data android:name="android.content.SyncAdapter"
-                    android:resource="@xml/syncadapter" />
+                           android:resource="@xml/syncadapter" />
             </service>
             <service
-                android:name="com.marianhello.bgloc.sync.AuthenticatorService">
+                    android:name="com.marianhello.bgloc.sync.AuthenticatorService">
                 <intent-filter>
                     <action android:name="android.accounts.AccountAuthenticator"/>
                 </intent-filter>
                 <meta-data
-                    android:name="android.accounts.AccountAuthenticator"
-                    android:resource="@xml/authenticator" />
+                        android:name="android.accounts.AccountAuthenticator"
+                        android:resource="@xml/authenticator" />
             </service>
             <provider
-                android:name="com.marianhello.bgloc.sync.DummyContentProvider"
-                android:authorities="@string/content_authority"
-                android:exported="false"
-                android:syncable="true"/>
+                    android:name="com.marianhello.bgloc.sync.DummyContentProvider"
+                    android:authorities="@string/content_authority"
+                    android:exported="false"
+                    android:syncable="true"/>
             <service
-                android:enabled="true"
-                android:exported="false"
-                android:name="com.marianhello.bgloc.LocationService"
-                />
+                    android:enabled="true"
+                    android:exported="false"
+                    android:name="com.marianhello.bgloc.LocationService"
+            />
             <receiver
-                  android:name="com.marianhello.bgloc.BootCompletedReceiver"
-                  android:enabled="true"
-                  android:exported="true">
-               <intent-filter>
-                  <action android:name="android.intent.action.BOOT_COMPLETED" />
-               </intent-filter>
+                    android:name="com.marianhello.bgloc.BootCompletedReceiver"
+                    android:enabled="true"
+                    android:exported="true">
+                <intent-filter>
+                    <action android:name="android.intent.action.BOOT_COMPLETED" />
+                </intent-filter>
             </receiver>
         </config-file>
 
@@ -130,23 +136,23 @@
         </config-file>
 
         <edit-config file="res/xml/authenticator.xml" target="/*" mode="overwrite">
-          <account-authenticator
-              xmlns:android="http://schemas.android.com/apk/res/android"
-              android:accountType="@string/account_type"
-              android:icon="$ICON"
-              android:smallIcon="$SMALL_ICON"
-              android:label="$ACCOUNT_LABEL"/>
+            <account-authenticator
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:accountType="@string/account_type"
+                    android:icon="$ICON"
+                    android:smallIcon="$SMALL_ICON"
+                    android:label="$ACCOUNT_LABEL"/>
         </edit-config>
 
         <edit-config file="res/xml/syncadapter.xml" target="/*" mode="overwrite">
-          <sync-adapter
-              xmlns:android="http://schemas.android.com/apk/res/android"
-              android:contentAuthority="@string/content_authority"
-              android:accountType="@string/account_type"
-              android:userVisible="false"
-              android:supportsUploading="true"
-              android:allowParallelSyncs="false"
-              android:isAlwaysSyncable="true"/>
+            <sync-adapter
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:contentAuthority="@string/content_authority"
+                    android:accountType="@string/account_type"
+                    android:userVisible="false"
+                    android:supportsUploading="true"
+                    android:allowParallelSyncs="false"
+                    android:isAlwaysSyncable="true"/>
         </edit-config>
     </platform>
 
@@ -165,14 +171,14 @@
 
         <config-file target="*-Info.plist" parent="CFBundleURLTypes">
             <array>
-              <dict>
-                <key>CFBundleTypeRole</key>
-                <string>Editor</string>
-                <key>CFBundleURLSchemes</key>
-                <array>
-                  <string>prefs</string>
-                </array>
-              </dict>
+                <dict>
+                    <key>CFBundleTypeRole</key>
+                    <string>Editor</string>
+                    <key>CFBundleURLSchemes</key>
+                    <array>
+                        <string>prefs</string>
+                    </array>
+                </dict>
             </array>
         </config-file>
 
@@ -219,5 +225,5 @@
         <source-file src="ios/CDVBackgroundGeolocation/SQLiteLocationDAO.m" />
         <header-file src="ios/CDVBackgroundGeolocation/SQLiteOpenHelper.h" />
         <source-file src="ios/CDVBackgroundGeolocation/SQLiteOpenHelper.m" />
-     </platform>
+    </platform>
 </plugin>
