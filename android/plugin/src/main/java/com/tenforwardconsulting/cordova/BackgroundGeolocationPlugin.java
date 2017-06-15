@@ -12,29 +12,15 @@ Differences to original version:
 package com.tenforwardconsulting.cordova;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Application;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
+import android.content.*;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
+import android.os.*;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
-import android.text.TextUtils;
-
 import com.marianhello.bgloc.Config;
 import com.marianhello.bgloc.LocationService;
 import com.marianhello.bgloc.ResourceResolver;
@@ -48,7 +34,6 @@ import com.marianhello.logging.DBLogReader;
 import com.marianhello.logging.LogEntry;
 import com.marianhello.logging.LogReader;
 import com.marianhello.logging.LoggerManager;
-
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
@@ -81,7 +66,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     public static final String ACTION_GET_CONFIG = "getConfig";
     public static final String ACTION_GET_LOG_ENTRIES = "getLogEntries";
 
-    public static final int START_REQ_CODE = 0;
+    public static final int CHECK_REQ_CODE = 0;
     public static final int PERMISSION_DENIED_ERROR_CODE = 2;
     public static final String[] permissions = { Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION };
 
@@ -94,7 +79,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     private Config config;
     private CallbackContext callbackContext;
     private ArrayList<CallbackContext> stationaryContexts = new ArrayList<CallbackContext>();
-    private CallbackContext actionStartCallbackContext;
+    private CallbackContext actionCheckCallbackContext;
     private CallbackContext locationModeChangeCallbackContext;
     private ExecutorService executorService;
     private BackgroundLocation stationaryLocation;
@@ -239,6 +224,16 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         executorService =  Executors.newSingleThreadExecutor();
     }
 
+    private void checkLocationWithContext(final CallbackContext callbackContext) {
+        try {
+            int isLocationEnabled = BackgroundGeolocationPlugin.isLocationEnabled(getContext()) ? 1 : 0;
+            callbackContext.success(isLocationEnabled);
+        } catch (SettingNotFoundException e) {
+            log.error("Location service checked failed: {}", e.getMessage());
+            callbackContext.error("Location setting error occured");
+        }
+    }
+
     public boolean execute(String action, final JSONArray data, final CallbackContext callbackContext) {
         Context context = getContext();
 
@@ -250,14 +245,6 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
                         callbackContext.error("Plugin not configured. Please call configure method first.");
                         return;
                     }
-
-                    if (!hasPermissions()) {
-                        log.info("Requesting permissions from user");
-                        actionStartCallbackContext = callbackContext;
-                        PermissionHelper.requestPermissions(getSelf(), START_REQ_CODE, permissions);
-                        return;
-                    }
-
                     startAndBindBackgroundService();
                     callbackContext.success();
                 }
@@ -305,14 +292,17 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
             return true;
         } else if (ACTION_LOCATION_ENABLED_CHECK.equals(action)) {
             log.debug("Location services enabled check");
-            try {
-                int isLocationEnabled = BackgroundGeolocationPlugin.isLocationEnabled(context) ? 1 : 0;
-                callbackContext.success(isLocationEnabled);
-            } catch (SettingNotFoundException e) {
-                log.error("Location service checked failed: {}", e.getMessage());
-                callbackContext.error("Location setting error occured");
+            if (hasPermissions()) {
+                checkLocationWithContext(callbackContext);
+            } else {
+                executorService.execute(new Runnable() {
+                    public void run() {
+                        log.info("Requesting permissions from user");
+                        actionCheckCallbackContext = callbackContext;
+                        PermissionHelper.requestPermissions(getSelf(), CHECK_REQ_CODE, permissions);
+                    }
+                });
             }
-
             return true;
         } else if (ACTION_SHOW_LOCATION_SETTINGS.equals(action)) {
             showLocationSettings();
@@ -675,21 +665,19 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         return true;
     }
 
-    public void onRequestPermissionResult(int requestCode, String[] permissions,
-        int[] grantResults) throws JSONException {
+    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
         for (int r : grantResults) {
             if (r == PackageManager.PERMISSION_DENIED) {
                 log.info("Permission Denied!");
-                actionStartCallbackContext.error(JSONErrorFactory.getJSONError(PERMISSION_DENIED_ERROR_CODE, "Permission denied by user"));
-                actionStartCallbackContext = null;
+                actionCheckCallbackContext.error(JSONErrorFactory.getJSONError(PERMISSION_DENIED_ERROR_CODE, "Permission denied by user"));
+                actionCheckCallbackContext = null;
                 return;
             }
         }
         switch (requestCode) {
-            case START_REQ_CODE:
-                startAndBindBackgroundService();
-                actionStartCallbackContext.success();
-                actionStartCallbackContext = null;
+            case CHECK_REQ_CODE:
+                checkLocationWithContext(actionCheckCallbackContext);
+                actionCheckCallbackContext = null;
                 break;
         }
     }
