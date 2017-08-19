@@ -11,6 +11,8 @@ Differences to original version:
 
 package com.tenforwardconsulting.cordova;
 
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.ConnectionResult;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
@@ -210,6 +212,22 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         }
     };
 
+    private boolean checkPlayServices() {
+        log.info("checkPlayServices");
+        final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+        GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
+        int result = googleAPI.isGooglePlayServicesAvailable(getContext());
+        if (result != ConnectionResult.SUCCESS) {
+            log.info("result != ConnectionResult.SUCCESS");
+            if (googleAPI.isUserResolvableError(result)) {
+                log.info("googleAPI.isUserResolvableError(result)");
+                googleAPI.getErrorDialog(getActivity(), result, PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            }
+            return false;
+        }
+        return true;
+    }
+
     @Override
     protected void pluginInitialize() {
         super.pluginInitialize();
@@ -222,6 +240,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         final String authority = res.getStringResource(Config.CONTENT_AUTHORITY_RESOURCE);
 
         executorService =  Executors.newSingleThreadExecutor();
+        checkPlayServices();
     }
 
     private void checkLocationWithContext(final CallbackContext callbackContext) {
