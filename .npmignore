@@ -1,13 +1,23 @@
-# prevent accidental commits by exclude everything
+# exclude everything
 /*
 
 # only include project files
 !/.npmignore
 !/*.md
-!/*.png
 !/plugin.xml
 !/package.json
 !/www
 !/android
+/android/*
+!/android/logtofile.gradle
+!/android/BackgroundGeolocation
+/android/BackgroundGeolocation/*
+!/android/BackgroundGeolocation/src
+!/android/CDVBackgroundGeolocation
+/android/CDVBackgroundGeolocation/*
+!/android/CDVBackgroundGeolocation/src
 !/ios
+/ios/*
+!/ios/BackgroundGeolocation
+!/ios/CDVBackgroundGeolocation
 !/LICENSE
