@@ -18,6 +18,8 @@ import android.content.pm.PackageManager;
 import android.provider.Settings.SettingNotFoundException;
 import android.support.v4.content.ContextCompat;
 
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.ConnectionResult;
 import com.marianhello.bgloc.BackgroundGeolocationFacade;
 import com.marianhello.bgloc.Config;
 import com.marianhello.bgloc.LocationService;
@@ -76,6 +78,22 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Plugin
 
     private org.slf4j.Logger logger;
 
+    private boolean checkPlayServices() {
+        log.info("checkPlayServices");
+        final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+        GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
+        int result = googleAPI.isGooglePlayServicesAvailable(getContext());
+        if (result.equals != ConnectionResult.SUCCESS) {
+            log.info("result != ConnectionResult.SUCCESS");
+            if (googleAPI.isUserResolvableError(result)) {
+                log.info("googleAPI.isUserResolvableError(result)");
+                googleAPI.getErrorDialog(getActivity(), result, PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            }
+            return false;
+        }
+        return true;
+    }
+
     @Override
     protected void pluginInitialize() {
         super.pluginInitialize();
@@ -83,6 +101,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Plugin
         facade = new BackgroundGeolocationFacade(this);
 
         logger = LoggerManager.getLogger(BackgroundGeolocationPlugin.class);
+        checkPlayServices();
     }
 
     public boolean execute(String action, final JSONArray data, final CallbackContext callbackContext) {
