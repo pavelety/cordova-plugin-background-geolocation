@@ -1,41 +1,19 @@
 package com.marianhello.bgloc;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
+import android.content.*;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
+import android.os.*;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.text.TextUtils;
-
-import com.marianhello.bgloc.data.BackgroundActivity;
-import com.marianhello.bgloc.data.BackgroundLocation;
-import com.marianhello.bgloc.data.ConfigurationDAO;
-import com.marianhello.bgloc.data.DAOFactory;
-import com.marianhello.bgloc.data.LocationDAO;
+import com.marianhello.bgloc.data.*;
 import com.marianhello.logging.DBLogReader;
 import com.marianhello.logging.LogEntry;
 import com.marianhello.logging.LogReader;
 import com.marianhello.logging.LoggerManager;
-
 import org.json.JSONException;
 
 import java.util.Collection;
@@ -48,13 +26,17 @@ public class BackgroundGeolocationFacade {
     public static final int AUTHORIZATION_AUTHORIZED = 1;
     public static final int AUTHORIZATION_DENIED = 0;
 
-    public static final String[] PERMISSIONS = { Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION };
+    public static final String[] PERMISSIONS = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
 
     private static final int MESSENGER_CLIENT_ID = 666;
 
-    /** Messenger for communicating with the service. */
+    /**
+     * Messenger for communicating with the service.
+     */
     private Messenger mService = null;
-    /** Flag indicating whether we have called bind on the service. */
+    /**
+     * Flag indicating whether we have called bind on the service.
+     */
     private Boolean mIsBound = false;
     private Boolean locationModeChangeReceiverRegistered = false;
     private Config mConfig = null;
@@ -199,15 +181,18 @@ public class BackgroundGeolocationFacade {
         }
     };
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    private void registerLocationModeChangeReceiver () {
+    //    @TargetApi(Build.VERSION_CODES.KITKAT)
+    private void registerLocationModeChangeReceiver() {
         if (locationModeChangeReceiverRegistered) return;
-
-        getContext().registerReceiver(locationModeChangeReceiver, new IntentFilter(LocationManager.MODE_CHANGED_ACTION));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            getContext().registerReceiver(locationModeChangeReceiver, new IntentFilter(LocationManager.MODE_CHANGED_ACTION));
+        } else {
+            getContext().registerReceiver(locationModeChangeReceiver, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
+        }
         locationModeChangeReceiverRegistered = true;
     }
 
-    private void unregisterLocationModeChangeReceiver () {
+    private void unregisterLocationModeChangeReceiver() {
         if (locationModeChangeReceiverRegistered == false) return;
 
         Context context = getContext();
@@ -397,7 +382,7 @@ public class BackgroundGeolocationFacade {
         context.bindService(locationServiceIntent, mConnection, Context.BIND_IMPORTANT);
     }
 
-    private void unbindService () {
+    private void unbindService() {
         if (mIsBound == false) return;
 
         logger.debug("Unbinding from service");
@@ -478,15 +463,15 @@ public class BackgroundGeolocationFacade {
 
     private static boolean isLocationEnabled(Context context) throws SettingNotFoundException {
         int locationMode = 0;
-        String locationProviders;
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             locationMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE);
-            return locationMode != Settings.Secure.LOCATION_MODE_OFF;
-
+            return locationMode == Settings.Secure.LOCATION_MODE_HIGH_ACCURACY;
         } else {
-            locationProviders = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
-            return !TextUtils.isEmpty(locationProviders);
+            LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+            PackageManager packageManager = context.getPackageManager();
+            //if has gps - it must be on AND if has googleservices - it must be on
+            return (!packageManager.hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS) || locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+                    && (!packageManager.hasSystemFeature(PackageManager.FEATURE_LOCATION_NETWORK) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
         }
     }
 }

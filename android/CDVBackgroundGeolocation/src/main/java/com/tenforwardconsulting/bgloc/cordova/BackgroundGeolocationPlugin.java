@@ -17,20 +17,14 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.provider.Settings.SettingNotFoundException;
 import android.support.v4.content.ContextCompat;
-
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.ConnectionResult;
-import com.marianhello.bgloc.BackgroundGeolocationFacade;
-import com.marianhello.bgloc.Config;
-import com.marianhello.bgloc.LocationService;
-import com.marianhello.bgloc.PluginDelegate;
-import com.marianhello.bgloc.PluginError;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.marianhello.bgloc.*;
 import com.marianhello.bgloc.cordova.ConfigMapper;
 import com.marianhello.bgloc.data.BackgroundActivity;
 import com.marianhello.bgloc.data.BackgroundLocation;
 import com.marianhello.logging.LogEntry;
 import com.marianhello.logging.LoggerManager;
-
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
@@ -77,16 +71,17 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Plugin
     private CallbackContext callbackContext;
 
     private org.slf4j.Logger logger;
+    private boolean noPlayServices = false;
 
     private boolean checkPlayServices() {
-        log.info("checkPlayServices");
+        logger.info("checkPlayServices");
         final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
         GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
         int result = googleAPI.isGooglePlayServicesAvailable(getContext());
-        if (result.equals != ConnectionResult.SUCCESS) {
-            log.info("result != ConnectionResult.SUCCESS");
+        if (result != ConnectionResult.SUCCESS) {
+            logger.info("result != ConnectionResult.SUCCESS");
             if (googleAPI.isUserResolvableError(result)) {
-                log.info("googleAPI.isUserResolvableError(result)");
+                logger.info("googleAPI.isUserResolvableError(result)");
                 googleAPI.getErrorDialog(getActivity(), result, PLAY_SERVICES_RESOLUTION_REQUEST).show();
             }
             return false;
@@ -101,7 +96,9 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Plugin
         facade = new BackgroundGeolocationFacade(this);
 
         logger = LoggerManager.getLogger(BackgroundGeolocationPlugin.class);
-        checkPlayServices();
+        if (!checkPlayServices()) {
+            noPlayServices = true;
+        }
     }
 
     public boolean execute(String action, final JSONArray data, final CallbackContext callbackContext) {
@@ -112,8 +109,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Plugin
             this.callbackContext = callbackContext;
 
             return true;
-        }
-        else if (ACTION_START.equals(action)) {
+        } else if (ACTION_START.equals(action)) {
             runOnWebViewThread(new Runnable() {
                 public void run() {
                     start();
@@ -144,6 +140,9 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Plugin
                 public void run() {
                     try {
                         Config config = ConfigMapper.fromJSONObject(data.getJSONObject(0));
+                        if (noPlayServices) {
+                            config.setLocationProvider(Config.DISTANCE_FILTER_PROVIDER);
+                        }
                         facade.configure(config);
                         callbackContext.success();
                     } catch (Exception e) {
@@ -293,16 +292,13 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Plugin
                 logger.error("Configuration error: {}", e.getMessage());
                 sendError(new PluginError(PluginError.JSON_ERROR, e.getMessage()));
             }
-        } else {
-            logger.debug("Permissions not granted");
-            cordova.requestPermissions(this, PERMISSIONS_REQUEST_CODE, BackgroundGeolocationFacade.PERMISSIONS);
         }
     }
 
     /**
      * Called when the system is about to start resuming a previous activity.
      *
-     * @param multitasking		Flag indicating if multitasking is turned on for app
+     * @param multitasking Flag indicating if multitasking is turned on for app
      */
     public void onPause(boolean multitasking) {
         logger.info("App will be paused multitasking={}", multitasking);
@@ -313,7 +309,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Plugin
     /**
      * Called when the activity will start interacting with the user.
      *
-     * @param multitasking		Flag indicating if multitasking is turned on for app
+     * @param multitasking Flag indicating if multitasking is turned on for app
      */
     public void onResume(boolean multitasking) {
         logger.info("App will be resumed multitasking={}", multitasking);
@@ -339,7 +335,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Plugin
      * The final call you receive before your activity is destroyed.
      * Checks to see if it should turn off
      */
-     @Override
+    @Override
     public void onDestroy() {
         logger.info("Destroying plugin");
         facade.onAppDestroy();
@@ -360,9 +356,9 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Plugin
     }
 
     private void sendEvent(String name) {
-         if (callbackContext == null) {
-             return;
-         }
+        if (callbackContext == null) {
+            return;
+        }
         JSONObject event = new JSONObject();
         try {
             event.put("name", name);
@@ -414,7 +410,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Plugin
             PluginResult result = new PluginResult(PluginResult.Status.ERROR, error.toJSONObject());
             result.setKeepCallback(true);
             callbackContext.sendPluginResult(result);
-        } catch(JSONException je) {
+        } catch (JSONException je) {
             logger.error("Error sending error {}: {}", je.getMessage());
         }
     }
@@ -518,7 +514,12 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Plugin
     }
 
     public boolean hasPermissions() {
-        return hasPermissions(getContext(), BackgroundGeolocationFacade.PERMISSIONS);
+        boolean has = hasPermissions(getContext(), BackgroundGeolocationFacade.PERMISSIONS);
+        if (!has) {
+            logger.debug("Permissions not granted");
+            cordova.requestPermissions(this, PERMISSIONS_REQUEST_CODE, BackgroundGeolocationFacade.PERMISSIONS);
+        }
+        return has;
     }
 
     @Override
@@ -552,7 +553,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Plugin
     }
 
     public static boolean hasPermissions(Context context, String[] permissions) {
-        for (String perm: permissions) {
+        for (String perm : permissions) {
             if (ContextCompat.checkSelfPermission(context, perm) != PackageManager.PERMISSION_GRANTED) {
                 return false;
             }

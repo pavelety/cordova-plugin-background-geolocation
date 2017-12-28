@@ -95,7 +95,7 @@ public class ActivityRecognitionLocationProvider extends AbstractLocationProvide
     @Override
     public void onLocationChanged(Location location) {
         logger.debug("Location change: {}", location.toString());
-//removed because it prevent first location to send in JS
+//removed because it prevents first location to send in JS
 //        if (lastActivity.getType() == DetectedActivity.STILL) {
 //            handleStationary(location);
 //            stopTracking();
