@@ -3,7 +3,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-plugin-pavelety-background-geolocation"
-        version="3.0.0-alpha.14.1">
+        version="3.0.0-alpha.14.2">
     <name>CDVBackgroundGeolocation</name>
     <description>Cordova Background Geolocation Plugin</description>
     <license>Apache-2.0</license>
@@ -85,6 +85,7 @@
         <source-file src="android/BackgroundGeolocation/src/main/java/com/tenforwardconsulting/bgloc/DistanceFilterLocationProvider.java" target-dir="src/com/tenforwardconsulting/bgloc" />
         <source-file src="android/BackgroundGeolocation/src/main/java/org/apache/commons/io/Charsets.java" target-dir="src/org/apache/commons/io" />
         <source-file src="android/BackgroundGeolocation/src/main/java/org/apache/commons/io/input/ReversedLinesFileReader.java" target-dir="src/org/apache/commons/io/input" />
+        <source-file src="android/BackgroundGeolocation/src/main/java/ru/likeapp/doze/BatteryOptimization.java" target-dir="src/ru/likeapp/doze" />
         <source-file src="android/CDVBackgroundGeolocation/src/main/java/com/marianhello/bgloc/cordova/ConfigMapper.java" target-dir="src/com/marianhello/bgloc/cordova" />
         <source-file src="android/CDVBackgroundGeolocation/src/main/java/com/tenforwardconsulting/bgloc/cordova/BackgroundGeolocationPlugin.java" target-dir="src/com/tenforwardconsulting/bgloc/cordova" />
 
