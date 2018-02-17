@@ -1,4 +1,10 @@
-# cordova-plugin-mauron85-background-geolocation
+# diff cordova-plugin-pavelety-background-geolocation with main fork
+- registerLocationModeChangeReceiver all android supported
+- isLocationEnabled checks GPS for high accuracy (required), works on devices event without GPS module
+- onLocationChanged sends locations event in STILL activity (fast location updates)
+- ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS/ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS allows battery usage in background on Android >= 6.0
+- hasPermissions request permissions if not has
+- checkPlayServices check version of Play Services, it hugely improves locations quality
 
 # Breaking changes
 
@@ -45,7 +51,7 @@ See [MIGRATIONS.md](/MIGRATIONS.md)
 ## Installing the plugin
 
 ```
-cordova plugin add cordova-plugin-mauron85-background-geolocation
+cordova plugin add cordova-plugin-pavelety-background-geolocation
 ```
 
 Default iOS location permission prompt can be changed in your config.xml:

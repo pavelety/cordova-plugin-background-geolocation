@@ -31,6 +31,7 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import ru.likeapp.doze.BatteryOptimization;
 
 import java.util.Collection;
 
@@ -99,6 +100,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Plugin
         if (!checkPlayServices()) {
             noPlayServices = true;
         }
+        BatteryOptimization.ignore(getContext());
     }
 
     public boolean execute(String action, final JSONArray data, final CallbackContext callbackContext) {
