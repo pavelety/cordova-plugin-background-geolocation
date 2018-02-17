@@ -3,7 +3,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-plugin-pavelety-background-geolocation"
-        version="3.0.0-alpha.12.1">
+        version="3.0.0-alpha.14">
     <name>CDVBackgroundGeolocation</name>
     <description>Cordova Background Geolocation Plugin</description>
     <license>Apache-2.0</license>
@@ -94,41 +94,41 @@
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
             <service
-                    android:name="com.marianhello.bgloc.sync.SyncService"
-                    android:exported="true"
-                    android:process=":sync">
+                android:name="com.marianhello.bgloc.sync.SyncService"
+                android:exported="true"
+                android:process=":sync">
                 <intent-filter>
                     <action android:name="android.content.SyncAdapter"/>
                 </intent-filter>
                 <meta-data android:name="android.content.SyncAdapter"
-                           android:resource="@xml/syncadapter" />
+                    android:resource="@xml/syncadapter" />
             </service>
             <service
-                    android:name="com.marianhello.bgloc.sync.AuthenticatorService">
+                android:name="com.marianhello.bgloc.sync.AuthenticatorService">
                 <intent-filter>
                     <action android:name="android.accounts.AccountAuthenticator"/>
                 </intent-filter>
                 <meta-data
-                        android:name="android.accounts.AccountAuthenticator"
-                        android:resource="@xml/authenticator" />
+                    android:name="android.accounts.AccountAuthenticator"
+                    android:resource="@xml/authenticator" />
             </service>
             <provider
-                    android:name="com.marianhello.bgloc.sync.DummyContentProvider"
-                    android:authorities="@string/content_authority"
-                    android:exported="false"
-                    android:syncable="true"/>
+                android:name="com.marianhello.bgloc.sync.DummyContentProvider"
+                android:authorities="@string/content_authority"
+                android:exported="false"
+                android:syncable="true"/>
             <service
-                    android:enabled="true"
-                    android:exported="false"
-                    android:name="com.marianhello.bgloc.LocationService"
-            />
+                android:enabled="true"
+                android:exported="false"
+                android:name="com.marianhello.bgloc.LocationService"
+                />
             <receiver
-                    android:name="com.marianhello.bgloc.BootCompletedReceiver"
-                    android:enabled="true"
-                    android:exported="true">
-                <intent-filter>
-                    <action android:name="android.intent.action.BOOT_COMPLETED" />
-                </intent-filter>
+                  android:name="com.marianhello.bgloc.BootCompletedReceiver"
+                  android:enabled="true"
+                  android:exported="true">
+               <intent-filter>
+                  <action android:name="android.intent.action.BOOT_COMPLETED" />
+               </intent-filter>
             </receiver>
         </config-file>
 
@@ -206,14 +206,14 @@
 
         <config-file target="*-Info.plist" parent="CFBundleURLTypes">
             <array>
-                <dict>
-                    <key>CFBundleTypeRole</key>
-                    <string>Editor</string>
-                    <key>CFBundleURLSchemes</key>
-                    <array>
-                        <string>prefs</string>
-                    </array>
-                </dict>
+              <dict>
+                <key>CFBundleTypeRole</key>
+                <string>Editor</string>
+                <key>CFBundleURLSchemes</key>
+                <array>
+                  <string>prefs</string>
+                </array>
+              </dict>
             </array>
         </config-file>
 
@@ -287,5 +287,5 @@
         <source-file src="ios/BackgroundGeolocation/SQLiteOpenHelper.m" />
         <header-file src="ios/CDVBackgroundGeolocation/CDVBackgroundGeolocation.h" />
         <source-file src="ios/CDVBackgroundGeolocation/CDVBackgroundGeolocation.m" />
-        </platform>
+     </platform>
 </plugin>
