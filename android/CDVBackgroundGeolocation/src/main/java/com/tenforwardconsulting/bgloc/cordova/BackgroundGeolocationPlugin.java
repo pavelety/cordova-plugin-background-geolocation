@@ -100,7 +100,6 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Plugin
         if (!checkPlayServices()) {
             noPlayServices = true;
         }
-        BatteryOptimization.ignore(getContext());
     }
 
     public boolean execute(String action, final JSONArray data, final CallbackContext callbackContext) {
@@ -520,6 +519,8 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Plugin
         if (!has) {
             logger.debug("Permissions not granted");
             cordova.requestPermissions(this, PERMISSIONS_REQUEST_CODE, BackgroundGeolocationFacade.PERMISSIONS);
+        } else {
+            BatteryOptimization.ignore(getContext());
         }
         return has;
     }
@@ -548,7 +549,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Plugin
                 // start service
                 logger.info("User granted requested permissions");
                 facade.start();
-
+                BatteryOptimization.ignore(getContext());
                 return;
             }
         }
