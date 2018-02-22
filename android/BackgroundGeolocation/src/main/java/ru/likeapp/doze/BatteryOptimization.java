@@ -19,18 +19,21 @@ public abstract class BatteryOptimization {
     public static void ignore(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             logger.info("BatteryOptimization ignore: android version OK");
-            Intent intent = new Intent();
-            String packageName = context.getPackageName();
-            PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-            if (pm.isIgnoringBatteryOptimizations(packageName)) {
-                logger.info("BatteryOptimization ignore: isIgnoringBatteryOptimizations");
-                return;
-            } else {
-                logger.info("BatteryOptimization ignore: setAction ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS");
-                intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-                intent.setData(Uri.parse("package:" + packageName));
+            try {
+                String packageName = context.getPackageName();
+                PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+                if (pm.isIgnoringBatteryOptimizations(packageName)) {
+                    logger.info("BatteryOptimization ignore: isIgnoringBatteryOptimizations");
+                } else {
+                    logger.info("BatteryOptimization ignore: setAction ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS");
+                    Intent intent = new Intent();
+                    intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                    intent.setData(Uri.parse("package:" + packageName));
+                    context.startActivity(intent);
+                }
+            } catch (Exception e) {
+                logger.error("BatteryOptimization ignore failed: {}", e.getMessage());
             }
-            context.startActivity(intent);
         }
     }
 }
