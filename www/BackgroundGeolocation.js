@@ -45,11 +45,18 @@ var BackgroundGeolocation = {
 
   NOT_AUTHORIZED: 0,
   AUTHORIZED: 1,
+  AUTHORIZED_FOREGROUND: 2,
 
   HIGH_ACCURACY: 0,
   MEDIUM_ACCURACY: 100,
   LOW_ACCURACY: 1000,
   PASSIVE_ACCURACY: 10000,
+
+  LOG_ERROR: 'ERROR',
+  LOG_WARN: 'WARN',
+  LOG_INFO: 'INFO',
+  LOG_DEBUG: 'DEBUG',
+  LOG_TRACE: 'TRACE',
 
   configure: function (config, success, failure) {
     exec(success || emptyFnc,
@@ -157,11 +164,28 @@ var BackgroundGeolocation = {
       'deleteAllLocations', []);
   },
 
-  getLogEntries: function (limit, success, failure) {
-    exec(success || emptyFnc,
-      failure || emptyFnc,
+  getLogEntries: function(limit /*, offset = 0, minLevel = "DEBUG", success = emptyFnc, failure = emptyFnc */) {
+    var acnt = arguments.length;
+    var offset, minLevel, success, error;
+
+    if (acnt > 1 && typeof arguments[1] == 'function') {
+      // backward compatibility
+      console.log('[WARN]: Calling deprecated variant of getLogEntries method.');
+      offset = 0;
+      minLevel = BackgroundGeolocation.LOG_DEBUG;
+      success = arguments[1] || emptyFnc;
+      failure = arguments[2] || emptyFnc;
+    } else {
+      offset = acnt > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+      minLevel = acnt > 2 && arguments[2] !== undefined ? arguments[2] : BackgroundGeolocation.LOG_DEBUG;
+      success = acnt > 3 && arguments[3] !== undefined ? arguments[3] : emptyFnc;
+      failure = acnt > 4 && arguments[4] !== undefined ? arguments[4] : emptyFnc;
+    }
+
+    exec(success,
+      failure,
       'BackgroundGeolocation',
-      'getLogEntries', [limit]);
+      'getLogEntries', [limit, offset, minLevel]);
   },
 
   checkStatus: function (success, failure) {
@@ -183,6 +207,20 @@ var BackgroundGeolocation = {
       failure || emptyFnc,
       'BackgroundGeolocation',
       'endTask', [taskKey]);
+  },
+
+  headlessTask: function (func, success, failure) {
+    exec(success || emptyFnc,
+      failure || emptyFnc,
+      'BackgroundGeolocation',
+      'registerHeadlessTask', [func.toString()]);
+  },
+
+  forceSync: function (success, failure) {
+    exec(success || emptyFnc,
+      failure || emptyFnc,
+      'BackgroundGeolocation',
+      'forceSync', []);
   },
 
   on: function (event, callbackFn) {

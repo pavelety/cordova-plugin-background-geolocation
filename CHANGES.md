@@ -14,8 +14,26 @@ Since alpha.8:
 - Android on "activity" event
 - iOS configuration persistence
 
-Since alpha.12
+Since alpha.12:
 - iOS ACTIVITY_PROVIDER (experimental)
+
+Since alpha.15:
+- checkStatus returns status of location services (locationServicesEnabled)
+- iOS RAW_LOCATION_PROVIDER continue to run on app terminate
+
+Since alpha.19:
+- Android Headless Task
+
+Since alpha.20:
+- Android location parameters isFromMockProvider and mockLocationsEnabled
+
+Since alpha.24:
+- Android Oreo support
+
+Since alpha.25:
+- method forceSync
+- option to get logs by offset and filter by log level
+- log uncaught exceptions
 
 #### Changed
 - start and stop methods doesn't accept callback (use event listeners instead)
@@ -30,18 +48,48 @@ Since alpha.12
 Since alpha.8:
 - Android bind to service on facade construct
 
-Since alpha.14
+Since alpha.14:
 - iOS saveBatteryOnBackground defaults to false
+
+Since alpha.15:
+- shared code base with react-native
+
+Since alpha.25:
+- Android common error format
+- Android remove sync delay when conditions are met
+- Android consider HTTP 201 response code as succesful post
+- Android obey system sync setting
 
 ### Fixed
 
 Since alpha.13:
 - iOS open location settings on iOS 10 and later (PR #158) by @asafron
 
+Since alpha.15:
+- checkStatus authorization
+- Android fix for #362 Build Failed: cannot find symbol (PR #378)
+
+Since alpha.18:
+- Android fix #276 - NullPointerException: onTaskRemoved
+- Android fix #380 - allow to override android support library
+
+Since alpha.19:
+- Android fix event listeners not triggering after app is restarted and service was running
+
+Since alpha.23:
+- iOS fix #394 - App Store Rejection - Prefs Non-Public URL Scheme
+- iOS reset connectivity status on stop
+
+Since alpha.24:
+- Android fix service accidently started with default or stored config
+
+Since alpha.25:
+- Android add guards to prevent some race conditions
+- Android config null handling
+
 ### [2.3.3] - 2017-11-17
 ### Added
 - Android allow override google play services version
-
 
 ### [2.3.2] - 2017-11-06
 ### Fix
