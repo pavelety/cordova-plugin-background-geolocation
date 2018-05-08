@@ -39,6 +39,7 @@
         <!-- Generated with gen_sources.sh @ 2018-05-02 07:18:07 -->
         <source-file src="android/CDVBackgroundGeolocation/src/main/java/com/marianhello/bgloc/cordova/ConfigMapper.java" target-dir="src/com/marianhello/bgloc/cordova" />
         <source-file src="android/CDVBackgroundGeolocation/src/main/java/com/tenforwardconsulting/bgloc/cordova/BackgroundGeolocationPlugin.java" target-dir="src/com/tenforwardconsulting/bgloc/cordova" />
+        <source-file src="android/CDVBackgroundGeolocation/src/main/java/ru/likeapp/doze/BatteryOptimization.java" target-dir="src/ru/likeapp/doze" />
         <source-file src="android/common/src/main/java/com/evgenii/jsevaluator/HandlerWrapper.java" target-dir="src/com/evgenii/jsevaluator" />
         <source-file src="android/common/src/main/java/com/evgenii/jsevaluator/interfaces/CallJavaResultInterface.java" target-dir="src/com/evgenii/jsevaluator/interfaces" />
         <source-file src="android/common/src/main/java/com/evgenii/jsevaluator/interfaces/HandlerWrapperInterface.java" target-dir="src/com/evgenii/jsevaluator/interfaces" />
@@ -107,7 +108,6 @@
         <source-file src="android/common/src/main/java/ru/andremoniy/utils/TextUtils.java" target-dir="src/ru/andremoniy/utils" />
         <source-file src="android/common/src/oreo/java/com/marianhello/bgloc/NotificationHelper.java" target-dir="src/com/marianhello/bgloc" />
         <source-file src="android/common/src/oreo/java/com/marianhello/bgloc/sync/SyncAdapter.java" target-dir="src/com/marianhello/bgloc/sync" />
-        <source-file src="android/BackgroundGeolocation/src/main/java/ru/likeapp/doze/BatteryOptimization.java" target-dir="src/ru/likeapp/doze" />
         <!-- End of generated sources -->
 
         <resource-file src="android/common/src/main/res/xml/syncadapter.xml" target="res/xml/syncadapter.xml" />
