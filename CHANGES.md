@@ -35,6 +35,22 @@ Since alpha.25:
 - option to get logs by offset and filter by log level
 - log uncaught exceptions
 
+Since alpha.30:
+- method getCurrentLocation
+
+Since alpha.41:
+- notificationsEnabled config option (by [@danielgindi](https://github.com/danielgindi/))
+More info: https://github.com/mauron85/react-native-background-geolocation/pull/269
+- Allow stopping location updates on status "285 Updates Not Required" (by [@danielgindi](https://github.com/danielgindi/))
+More info: https://github.com/mauron85/react-native-background-geolocation/pull/271
+
+Since alpha.45:
+- Listen for 401 Unauthorized status codes received from http server (by [@FeNoMeNa](https://github.com/FeNoMeNa/))
+More info: https://github.com/mauron85/react-native-background-geolocation/pull/308/files
+
+Since alpha.46:
+- typescript definitions
+
 #### Changed
 - start and stop methods doesn't accept callback (use event listeners instead)
 - for background syncing syncUrl option is required
@@ -59,6 +75,35 @@ Since alpha.25:
 - Android remove sync delay when conditions are met
 - Android consider HTTP 201 response code as succesful post
 - Android obey system sync setting
+
+Since alpha.28:
+- Android remove wake locks
+https://github.com/mauron85/background-geolocation-android/pull/4 by @grassick
+
+Since alpha.29:
+- Android show service notification only when in background
+- Android remove config option startForeground (related to above)
+
+Since alpha.32:
+- Android bring back startForeground config option (BREAKING CHANGE!)
+
+startForeground has slightly different meaning.
+
+If false (default) then service will create notification and promotes
+itself to foreground service, when client unbinds from service.
+This typically happens when application is moving to background.
+If app is moving back to foreground (becoming visible to user)
+service destroys notification and also stop being foreground service.
+
+If true service will create notification and will stay in foreground at all times.
+
+Since alpha.33:
+- Android internal changes (permission handling)
+
+Since alpha.40:
+- Android disable notification sound and vibration on oreo
+(PR: [#9](https://github.com/mauron85/background-geolocation-android/pull/9)
+by [@danielgindi](https://github.com/danielgindi/))
 
 ### Fixed
 
@@ -86,6 +131,52 @@ Since alpha.24:
 Since alpha.25:
 - Android add guards to prevent some race conditions
 - Android config null handling
+
+Since alpha.31:
+- iOS fix error message format
+- iOS fix missing getLogEntries arguments
+
+Since alpha.32:
+- iOS display debug notifications in foreground on iOS >= 10
+- iOS missing activity provider stationary event
+- Android getCurrentLocation request permission prompt
+
+Since alpha.35:
+- Android fix issue #431 - "dependencies.gradle" not found
+
+Since alpha.38:
+- iOS Fix crash on delete all location ([7392e39](https://github.com/mauron85/background-geolocation-ios/commit/7392e391c3de3ff0d6f5ef2ef19c34aba612bf9b) by [@acerbetti](https://github.com/acerbetti/))
+
+Since alpha.39:
+- Android Defer start and configure until service is ready
+(PR: [#7](https://github.com/mauron85/background-geolocation-android/pull/7)
+Commit: [00e1314](https://github.com/mauron85/background-geolocation-android/commit/00e131478ad4e37576eb85581bb663b65302a4e0) by [@danielgindi](https://github.com/danielgindi/),
+fixes #201, #181, #172)
+
+Since alpha.40:
+- iOS Avoid taking control of UNUserNotificationCenter
+(PR: [#268](https://github.com/mauron85/react-native-background-geolocation/pull/268))
+
+Since alpha.42:
+- Android fix locationService treating success as errors
+(PR: [#13](https://github.com/mauron85/background-geolocation-android/pull/13)
+by [@hoisel](https://github.com/hoisel/))
+
+Since alpha.43:
+- Android make sure mService exists when we call start or stop
+(PR: [#17](https://github.com/mauron85/background-geolocation-android/pull/17)
+by [@ivosabev](https://github.com/ivosabev/))
+
+Since alpha.46:
+- Android fix service crash on boot for Android 8 when startOnBoot option is used
+
+### [2.3.6] - 2018-09-11
+### Fixed
+- Android remove non public URL
+
+### [2.3.5] - 2018-03-29
+### Fixed
+- Android fix #384
 
 ### [2.3.3] - 2017-11-17
 ### Added

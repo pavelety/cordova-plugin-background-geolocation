@@ -197,6 +197,19 @@ function onDeviceReady() {
     BackgroundGeolocation.configure({ debug: false });
   });
 
+  BackgroundGeolocation.on('abort_requested', function() {
+    console.log('[INFO] Server responded with 285 Updates Not Required');
+
+    // Here we can decide whether we want stop the updates or not.
+    // If you've configured the server to return 285, then it means the server does not require further update.
+    // So the normal thing to do here would be to `BackgroundGeolocation.stop()`.
+    // But you might be counting on it to receive location updates in the UI, so you could just reconfigure and set `url` to null.
+  });
+
+  BackgroundGeolocation.on('http_authorization', () => {
+    console.log('[INFO] App needs to authorize the http requests');
+  });
+
   BackgroundGeolocation.checkStatus(function(status) {
     console.log('[INFO] BackgroundGeolocation service is running', status.isRunning);
     console.log('[INFO] BackgroundGeolocation services enabled', status.locationServicesEnabled);
@@ -212,7 +225,9 @@ function onDeviceReady() {
   // BackgroundGeolocation.start();
 
   // Don't forget to remove listeners at some point!
-  // BackgroundGeolocation.events.forEach(event => BackgroundGeolocation.removeAllListeners(event));
+  // BackgroundGeolocation.events.forEach(function(event) {
+  //   return BackgroundGeolocation.removeAllListeners(event);
+  // });
 }
 
 document.addEventListener('deviceready', onDeviceReady, false);
@@ -233,16 +248,17 @@ Configure options:
 | `distanceFilter`          | `Number`          | all          | The minimum distance (measured in meters) a device must move horizontally before an update event is generated. **@see** [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/distanceFilter).        | DIS,RAW     | 500                        | 
 | `stopOnTerminate`         | `Boolean`         | all          | Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app).                                                                                                                                                                                                                  | all         | true                       | 
 | `startOnBoot`             | `Boolean`         | Android      | Start background service on device boot.                                                                                                                                                                                                                                                                                                           | all         | false                      | 
-| `startForeground`         | `Boolean`         | Android      | If false location service will not be started in foreground and no notification will be shown.                                                                                                                                                                                                                                                     | all         | true                       | 
 | `interval`                | `Number`          | Android      | The minimum time interval between location updates in milliseconds. **@see** [Android docs](http://developer.android.com/reference/android/location/LocationManager.html#requestLocationUpdates(long,%20float,%20android.location.Criteria,%20android.app.PendingIntent)) for more information.                                                    | all         | 60000                      | 
 | `fastestInterval`         | `Number`          | Android      | Fastest rate in milliseconds at which your app can handle location updates. **@see** [Android  docs](https://developers.google.com/android/reference/com/google/android/gms/location/LocationRequest.html#getFastestInterval()).                                                                                                                   | ACT         | 120000                     | 
 | `activitiesInterval`      | `Number`          | Android      | Rate in milliseconds at which activity recognition occurs. Larger values will result in fewer activity detections while improving battery life.                                                                                                                                                                                                    | ACT         | 10000                      | 
 | `stopOnStillActivity`     | `Boolean`         | Android      | @deprecated stop location updates, when the STILL activity is detected                                                                                                                                                                                                                                                                             | ACT         | true                       | 
-| `notificationTitle`       | `String` optional | Android      | Custom notification title in the drawer.                                                                                                                                                                                                                                                                                                           | all         | "Background tracking"      | 
-| `notificationText`        | `String` optional | Android      | Custom notification text in the drawer.                                                                                                                                                                                                                                                                                                            | all         | "ENABLED"                  | 
-| `notificationIconColor`   | `String` optional | Android      | The accent color to use for notification. Eg. **#4CAF50**.                                                                                                                                                                                                                                                                                         | all         |                            | 
-| `notificationIconLarge`   | `String` optional | Android      | The filename of a custom notification icon. **@see** Android quirks.                                                                                                                                                                                                                                                                               | all         |                            | 
-| `notificationIconSmall`   | `String` optional | Android      | The filename of a custom notification icon. **@see** Android quirks.                                                                                                                                                                                                                                                                               | all         |                            | 
+| `notificationsEnabled`    | `Boolean`         | Android      | Enable/disable local notifications when tracking and syncing locations                                                                                                                                                                                                                                                                             | all         | true                       |
+| `startForeground`         | `Boolean`         | Android      | Allow location sync service to run in foreground state. Foreground state also requires a notification to be presented to the user.                                                                                                                                                                                                                 | all         | false                      |
+| `notificationTitle`       | `String` optional | Android      | Custom notification title in the drawer. (goes with `startForeground`)                                                                                                                                                                                                                                                                             | all         | "Background tracking"      | 
+| `notificationText`        | `String` optional | Android      | Custom notification text in the drawer. (goes with `startForeground`)                                                                                                                                                                                                                                                                              | all         | "ENABLED"                  | 
+| `notificationIconColor`   | `String` optional | Android      | The accent color to use for notification. Eg. **#4CAF50**. (goes with `startForeground`)                                                                                                                                                                                                                                                           | all         |                            | 
+| `notificationIconLarge`   | `String` optional | Android      | The filename of a custom notification icon. **@see** Android quirks. (goes with `startForeground`)                                                                                                                                                                                                                                                 | all         |                            | 
+| `notificationIconSmall`   | `String` optional | Android      | The filename of a custom notification icon. **@see** Android quirks. (goes with `startForeground`)                                                                                                                                                                                                                                                 | all         |                            | 
 | `activityType`            | `String`          | iOS          | [AutomotiveNavigation, OtherNavigation, Fitness, Other] Presumably, this affects iOS GPS algorithm. **@see** [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information | all         | "OtherNavigation"          | 
 | `pauseLocationUpdates`    | `Boolean`         | iOS          | Pauses location updates when app is paused. **@see* [Apple docs](https://developer.apple.com/documentation/corelocation/cllocationmanager/1620553-pauseslocationupdatesautomatical?language=objc)                                                                                                                                                  | all         | false                      | 
 | `saveBatteryOnBackground` | `Boolean`         | iOS          | Switch to less accurate significant changes and region monitory when in background                                                                                                                                                                                                                                                                 | all         | false                      | 
@@ -279,6 +295,34 @@ Start background geolocation.
 Platform: iOS, Android
 
 Stop background geolocation.
+
+### getCurrentLocation(success, fail, options)
+Platform: iOS, Android
+
+One time location check to get current location of the device.
+
+| Option parameter           | Type      | Description                                                                            |
+|----------------------------|-----------|----------------------------------------------------------------------------------------|
+| `timeout`                  | `Number`  | Maximum time in milliseconds device will wait for location                             |
+| `maximumAge`               | `Number`  | Maximum age in milliseconds of a possible cached location that is acceptable to return |
+| `enableHighAccuracy`       | `Boolean` | if true and if the device is able to provide a more accurate position, it will do so   |
+
+| Success callback parameter | Type      | Description                                                    |
+|----------------------------|-----------|----------------------------------------------------------------|
+| `location`                 | `Object`  | location object (@see [Location event](#location-event))       |
+
+| Error callback parameter   | Type      | Description                                                    |
+|----------------------------|-----------|----------------------------------------------------------------|
+| `code`                     | `Number`  | Reason of an error occurring when using the geolocating device |
+| `message`                  | `String`  | Message describing the details of the error                    |
+
+Error codes:
+
+| Value | Associated constant  | Description                                                              |
+|-------|----------------------|--------------------------------------------------------------------------|
+| 1     | PERMISSION_DENIED    | Request failed due missing permissions                                   |
+| 2     | LOCATION_UNAVAILABLE | Internal source of location returned an internal error                   |
+| 3     | TIMEOUT              | Timeout defined by `option.timeout was exceeded                          |
 
 ### isLocationEnabled(success, fail)
 Deprecated: This method is deprecated and will be removed in next major version.
@@ -389,7 +433,7 @@ Platform: Android, iOS
 Force sync of pending locations. Option `syncThreshold` will be ignored and
 all pending locations will be immediately posted to `syncUrl` in single batch.
 
-### getLogEntries(limit, offset, minLevel, success, fail)
+### getLogEntries(limit, fromId, minLevel, success, fail)
 Platform: Android, iOS
 
 Return all logged events. Useful for plugin debugging.
@@ -397,7 +441,7 @@ Return all logged events. Useful for plugin debugging.
 | Parameter  | Type          | Description                                                                                       |
 |------------|---------------|---------------------------------------------------------------------------------------------------|
 | `limit`    | `Number`      | limits number of returned entries                                                                 |
-| `offset`   | `Number`      | return entries from offset. Useful if you plan to implement infinite log scrolling*               |
+| `fromId`   | `Number`      | return entries after fromId. Useful if you plan to implement infinite log scrolling*              |
 | `minLevel` | `String`      | return log entries above level. Available levels: ["TRACE", "DEBUG", "INFO", "WARN", "ERROR]      |
 | `success`  | `Function`    | callback function which will be called with log entries                                           |
 
@@ -419,17 +463,19 @@ Unregister all event listeners for given event
 
 ## Events
 
-| Name                | Callback param         | Platform     | Provider*   | Description                            |
-|---------------------|------------------------|--------------|-------------|----------------------------------------|
-| `location`          | `Location`             | all          | all         | on location update                     |
-| `stationary`        | `Location`             | all          | DIS,ACT     | on device entered stationary mode      |
-| `activity`          | `Activity`             | Android      | ACT         | on activity detection                  |
-| `error`             | `{ code, message }`    | all          | all         | on plugin error                        |
-| `authorization`     | `status`               | all          | all         | on user toggle location service        |
-| `start`             |                        | all          | all         | geolocation has been started           |
-| `stop`              |                        | all          | all         | geolocation has been stopped           |
-| `foreground`        |                        | Android      | all         | app entered foreground state (visible) |
-| `background`        |                        | Android      | all         | app entered background state           |
+| Name                | Callback param         | Platform     | Provider*   | Description                                      |
+|---------------------|------------------------|--------------|-------------|--------------------------------------------------|
+| `location`          | `Location`             | all          | all         | on location update                               |
+| `stationary`        | `Location`             | all          | DIS,ACT     | on device entered stationary mode                |
+| `activity`          | `Activity`             | Android      | ACT         | on activity detection                            |
+| `error`             | `{ code, message }`    | all          | all         | on plugin error                                  |
+| `authorization`     | `status`               | all          | all         | on user toggle location service                  |
+| `start`             |                        | all          | all         | geolocation has been started                     |
+| `stop`              |                        | all          | all         | geolocation has been stopped                     |
+| `foreground`        |                        | Android      | all         | app entered foreground state (visible)           |
+| `background`        |                        | Android      | all         | app entered background state                     |
+| `abort_requested`   |                        | all          | all         | server responded with "285 Updates Not Required" |
+| `http_authorization`|                        | all          | all         | server responded with "401 Unauthorized"         |
 
 ### Location event
 | Location parameter     | Type      | Description                                                            |
@@ -521,7 +567,6 @@ BackgroundGeolocation.configure({
 });
 ```
 
-Note: only string keys and values are supported.
 Note: Keep in mind that all locations (even a single one) will be sent as an array of object(s), when postTemplate is `jsonObject` and array of array(s) for `jsonArray`!
 
 ### Android Headless Task (Experimental)

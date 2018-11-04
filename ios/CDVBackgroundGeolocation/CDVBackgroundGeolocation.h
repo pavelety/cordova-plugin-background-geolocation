@@ -9,10 +9,11 @@
 //  This is class is using code from christocracy cordova-plugin-background-geolocation plugin
 //  https://github.com/christocracy/cordova-plugin-background-geolocation
 
+#import <UserNotifications/UserNotifications.h>
 #import <Cordova/CDVPlugin.h>
 #import "MAURProviderDelegate.h"
 
-@interface CDVBackgroundGeolocation : CDVPlugin <MAURProviderDelegate>
+@interface CDVBackgroundGeolocation : CDVPlugin <MAURProviderDelegate, UNUserNotificationCenterDelegate>
 
 - (void) configure:(CDVInvokedUrlCommand*)command;
 - (void) start:(CDVInvokedUrlCommand*)command;
@@ -28,6 +29,7 @@
 - (void) getValidLocations:(CDVInvokedUrlCommand*)command;
 - (void) deleteLocation:(CDVInvokedUrlCommand*)command;
 - (void) deleteAllLocations:(CDVInvokedUrlCommand*)command;
+- (void) getCurrentLocation:(CDVInvokedUrlCommand*)command;
 - (void) getLogEntries:(CDVInvokedUrlCommand*)command;
 - (void) startTask:(CDVInvokedUrlCommand*)command;
 - (void) endTask:(CDVInvokedUrlCommand*)command;

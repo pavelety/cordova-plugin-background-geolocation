@@ -9,7 +9,6 @@
 //  This is class is using code from christocracy cordova-plugin-background-geolocation plugin
 //  https://github.com/christocracy/cordova-plugin-background-geolocation
 
-
 #import "CDVBackgroundGeolocation.h"
 #import "MAURConfig.h"
 #import "MAURBackgroundGeolocationFacade.h"
@@ -21,6 +20,9 @@ static NSString * const TAG = @"CDVBackgroundGeolocation";
     NSString *callbackId;
     MAURConfig *config;
     MAURBackgroundGeolocationFacade* facade;
+
+    API_AVAILABLE(ios(10.0))
+    __weak id<UNUserNotificationCenterDelegate> prevNotificationDelegate;
 }
 
 - (void)pluginInitialize
@@ -52,8 +54,7 @@ static NSString * const TAG = @"CDVBackgroundGeolocation";
         if ([facade configure:config error:&error]) {
             result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         } else {
-            NSString *errorMessage = [error localizedDescription];
-            result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage];
+            result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:[self errorToDictionary:error]];
         }
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }];
@@ -223,8 +224,7 @@ static NSString * const TAG = @"CDVBackgroundGeolocation";
         if (success) {
             result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         } else {
-            NSString *errorMessage = [error localizedDescription];
-            result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage];
+            result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:[self errorToDictionary:error]];
         }
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }];
@@ -240,8 +240,28 @@ static NSString * const TAG = @"CDVBackgroundGeolocation";
         if (success) {
             result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         } else {
-            NSString *errorMessage = [error localizedDescription];
-            result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage];
+            result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:[self errorToDictionary:error]];
+        }
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+}
+
+- (void) getCurrentLocation:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@ #%@", TAG, @"getCurrentLocation");
+    [self.commandDelegate runInBackground:^{
+        NSError *error = nil;
+        NSArray *args = command.arguments;
+        int timeout = [args objectAtIndex: 0] == [NSNull null] ? INT_MAX : [[args objectAtIndex: 0] intValue];
+        long maximumAge = [args objectAtIndex: 1] == [NSNull null] ? LONG_MAX : [[args objectAtIndex: 1] longValue];
+        BOOL enableHighAccuracy = [args objectAtIndex: 2] == [NSNull null] ? NO : [[args objectAtIndex: 2] boolValue];
+
+        MAURLocation *location = [facade getCurrentLocation:timeout maximumAge:maximumAge enableHighAccuracy:enableHighAccuracy error:&error];
+        CDVPluginResult* result;
+        if (location != nil) {
+            result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[location toDictionary]];
+        } else {
+            result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:[self errorToDictionary:error]];
         }
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }];
@@ -251,9 +271,15 @@ static NSString * const TAG = @"CDVBackgroundGeolocation";
 {
     NSLog(@"%@ #%@", TAG, @"getLogEntries");
     [self.commandDelegate runInBackground:^{
-        NSInteger limit = [command.arguments objectAtIndex: 0] == [NSNull null]
-            ? 0 : [[command.arguments objectAtIndex: 0] integerValue];
-        NSArray *logs = [facade getLogEntries:limit];
+        NSArray *args = command.arguments;
+        NSInteger limit = [args objectAtIndex: 0] == [NSNull null]
+            ? 0 : [[args objectAtIndex: 0] integerValue];
+        NSInteger entryId = [args objectAtIndex: 1] == [NSNull null]
+            ? 0 : [[args objectAtIndex: 1] integerValue];
+        NSString *minLogLevel = [args objectAtIndex: 2] == [NSNull null]
+            ? @"DEBUG" : [args objectAtIndex: 2];
+
+        NSArray *logs = [facade getLogEntries:limit fromLogEntryId:entryId minLogLevelFromString:minLogLevel];
         CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:logs];
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }];
@@ -338,15 +364,19 @@ static NSString * const TAG = @"CDVBackgroundGeolocation";
         return;
     }
 
+    CDVPluginResult* cordovaResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:[self errorToDictionary:error]];
+    [cordovaResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:cordovaResult callbackId:callbackId];
+}
+
+- (NSDictionary*) errorToDictionary:(NSError*)error
+{
     NSDictionary *userInfo = [error userInfo];
     NSString *errorMessage = [error localizedDescription];
     if (errorMessage == nil) {
         errorMessage = [[userInfo objectForKey:NSUnderlyingErrorKey] localizedDescription];
     }
-    NSDictionary *errorDict = @{ @"code": [NSNumber numberWithLong:error.code], @"message": errorMessage};
-    CDVPluginResult* cordovaResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:errorDict];
-    [cordovaResult setKeepCallbackAsBool:YES];
-    [self.commandDelegate sendPluginResult:cordovaResult callbackId:callbackId];
+    return @{ @"code": [NSNumber numberWithLong:error.code], @"message": errorMessage};
 }
 
 - (void) onAuthorizationChanged:(MAURLocationAuthorizationStatus)authStatus
@@ -403,12 +433,39 @@ static NSString * const TAG = @"CDVBackgroundGeolocation";
     [facade switchMode:MAURBackgroundMode];
 }
 
+-(void) onAbortRequested
+{
+    NSLog(@"%@ %@", TAG, @"abort requested by the server");
+    [self sendEvent:@"abort_requested"];
+}
+
+- (void) onHttpAuthorization {
+    NSLog(@"%@ %@", TAG, @"http authorization requested by the server");
+    [self sendEvent:@"http_authorization"];
+}
+
 /**@
  * on UIApplicationDidFinishLaunchingNotification
  */
 -(void) onFinishLaunching:(NSNotification *)notification
 {
+    if (@available(iOS 10, *)) {
+        UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+        center.delegate = self;
+    }
+    
     NSDictionary *dict = [notification userInfo];
+
+    MAURConfig *config = [facade getConfig];
+    if (config.isDebugging)
+    {
+        if (@available(iOS 10, *))
+        {
+            UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+            prevNotificationDelegate = center.delegate;
+            center.delegate = self;
+        }
+    }
 
     if ([dict objectForKey:UIApplicationLaunchOptionsLocationKey]) {
         NSLog(@"%@ %@", TAG, @"started by system on location event.");
@@ -417,6 +474,24 @@ static NSString * const TAG = @"CDVBackgroundGeolocation";
             [facade start:nil];
             [facade switchMode:MAURBackgroundMode];
         }
+    }
+}
+
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center
+       willPresentNotification:(UNNotification *)notification
+         withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler
+{
+    if (prevNotificationDelegate && [prevNotificationDelegate respondsToSelector:@selector(userNotificationCenter:willPresentNotification:withCompletionHandler:)])
+    {
+        // Give other delegates (like FCM) the chance to process this notification
+
+        [prevNotificationDelegate userNotificationCenter:center willPresentNotification:notification withCompletionHandler:^(UNNotificationPresentationOptions options) {
+            completionHandler(UNNotificationPresentationOptionAlert);
+        }];
+    }
+    else
+    {
+        completionHandler(UNNotificationPresentationOptionAlert);
     }
 }
 

@@ -33,7 +33,9 @@ var BackgroundGeolocation = {
     'error',
     'authorization',
     'foreground',
-    'background'
+    'background',
+    'abort_requested',
+    'http_authorization'
   ],
 
   DISTANCE_FILTER_PROVIDER: 0,
@@ -57,6 +59,10 @@ var BackgroundGeolocation = {
   LOG_INFO: 'INFO',
   LOG_DEBUG: 'DEBUG',
   LOG_TRACE: 'TRACE',
+
+  PERMISSION_DENIED: 1,
+  LOCATION_UNAVAILABLE: 2,
+  TIMEOUT: 3,
 
   configure: function (config, success, failure) {
     exec(success || emptyFnc,
@@ -162,6 +168,14 @@ var BackgroundGeolocation = {
       failure || emptyFnc,
       'BackgroundGeolocation',
       'deleteAllLocations', []);
+  },
+
+  getCurrentLocation: function(success, failure, options) {
+    options = options || {};
+    exec(success || emptyFnc,
+      failure || emptyFnc,
+      'BackgroundGeolocation',
+      'getCurrentLocation', [options.timeout, options.maximumAge, options.enableHighAccuracy]);
   },
 
   getLogEntries: function(limit /*, offset = 0, minLevel = "DEBUG", success = emptyFnc, failure = emptyFnc */) {

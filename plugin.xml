@@ -3,7 +3,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-plugin-pavelety-background-geolocation"
-        version="3.0.0-alpha.27">
+        version="3.0.0-alpha.46">
     <name>CDVBackgroundGeolocation</name>
     <description>Cordova Background Geolocation Plugin</description>
     <license>Apache-2.0</license>
@@ -33,10 +33,11 @@
         <preference name="ACCOUNT_TYPE" default="$PACKAGE_NAME.account" />
         <preference name="CONTENT_AUTHORITY" default="$PACKAGE_NAME" />
 
-        <framework src="android/common/logtofile.gradle" custom="true" type="gradleReference"/>
         <framework src="com.google.android.gms:play-services-location:$GOOGLE_PLAY_SERVICES_VERSION" />
         <framework src="com.android.support:support-v4:$ANDROID_SUPPORT_LIBRARY_VERSION" />
-        <!-- Generated with gen_sources.sh @ 2018-05-02 07:18:07 -->
+        <framework src="com.android.support:appcompat-v7:$ANDROID_SUPPORT_LIBRARY_VERSION" />
+        <framework src="android/dependencies.gradle" custom="true" type="gradleReference"/>
+        <!-- Generated with gen_sources.sh @ 2018-10-28 17:08:41 -->
         <source-file src="android/CDVBackgroundGeolocation/src/main/java/com/marianhello/bgloc/cordova/ConfigMapper.java" target-dir="src/com/marianhello/bgloc/cordova" />
         <source-file src="android/CDVBackgroundGeolocation/src/main/java/com/tenforwardconsulting/bgloc/cordova/BackgroundGeolocationPlugin.java" target-dir="src/com/tenforwardconsulting/bgloc/cordova" />
         <source-file src="android/CDVBackgroundGeolocation/src/main/java/ru/likeapp/doze/BatteryOptimization.java" target-dir="src/ru/likeapp/doze" />
@@ -51,7 +52,6 @@
         <source-file src="android/common/src/main/java/com/evgenii/jsevaluator/JsFunctionCallFormatter.java" target-dir="src/com/evgenii/jsevaluator" />
         <source-file src="android/common/src/main/java/com/evgenii/jsevaluator/WebViewWrapper.java" target-dir="src/com/evgenii/jsevaluator" />
         <source-file src="android/common/src/main/java/com/marianhello/bgloc/BackgroundGeolocationFacade.java" target-dir="src/com/marianhello/bgloc" />
-        <source-file src="android/common/src/main/java/com/marianhello/bgloc/BootCompletedReceiver.java" target-dir="src/com/marianhello/bgloc" />
         <source-file src="android/common/src/main/java/com/marianhello/bgloc/Config.java" target-dir="src/com/marianhello/bgloc" />
         <source-file src="android/common/src/main/java/com/marianhello/bgloc/data/AbstractLocationTemplate.java" target-dir="src/com/marianhello/bgloc/data" />
         <source-file src="android/common/src/main/java/com/marianhello/bgloc/data/ArrayListLocationTemplate.java" target-dir="src/com/marianhello/bgloc/data" />
@@ -74,6 +74,7 @@
         <source-file src="android/common/src/main/java/com/marianhello/bgloc/headless/StationaryTask.java" target-dir="src/com/marianhello/bgloc/headless" />
         <source-file src="android/common/src/main/java/com/marianhello/bgloc/headless/Task.java" target-dir="src/com/marianhello/bgloc/headless" />
         <source-file src="android/common/src/main/java/com/marianhello/bgloc/HttpPostService.java" target-dir="src/com/marianhello/bgloc" />
+        <source-file src="android/common/src/main/java/com/marianhello/bgloc/LocationManager.java" target-dir="src/com/marianhello/bgloc" />
         <source-file src="android/common/src/main/java/com/marianhello/bgloc/LocationService.java" target-dir="src/com/marianhello/bgloc" />
         <source-file src="android/common/src/main/java/com/marianhello/bgloc/PluginDelegate.java" target-dir="src/com/marianhello/bgloc" />
         <source-file src="android/common/src/main/java/com/marianhello/bgloc/PluginException.java" target-dir="src/com/marianhello/bgloc" />
@@ -83,6 +84,7 @@
         <source-file src="android/common/src/main/java/com/marianhello/bgloc/provider/LocationProvider.java" target-dir="src/com/marianhello/bgloc/provider" />
         <source-file src="android/common/src/main/java/com/marianhello/bgloc/provider/ProviderDelegate.java" target-dir="src/com/marianhello/bgloc/provider" />
         <source-file src="android/common/src/main/java/com/marianhello/bgloc/provider/RawLocationProvider.java" target-dir="src/com/marianhello/bgloc/provider" />
+        <source-file src="android/common/src/main/java/com/marianhello/bgloc/ProxyServiceConnection.java" target-dir="src/com/marianhello/bgloc" />
         <source-file src="android/common/src/main/java/com/marianhello/bgloc/ResourceResolver.java" target-dir="src/com/marianhello/bgloc" />
         <source-file src="android/common/src/main/java/com/marianhello/bgloc/sync/AccountHelper.java" target-dir="src/com/marianhello/bgloc/sync" />
         <source-file src="android/common/src/main/java/com/marianhello/bgloc/sync/Authenticator.java" target-dir="src/com/marianhello/bgloc/sync" />
@@ -102,10 +104,12 @@
         <source-file src="android/common/src/main/java/com/tenforwardconsulting/bgloc/DistanceFilterLocationProvider.java" target-dir="src/com/tenforwardconsulting/bgloc" />
         <source-file src="android/common/src/main/java/org/apache/commons/io/Charsets.java" target-dir="src/org/apache/commons/io" />
         <source-file src="android/common/src/main/java/org/apache/commons/io/input/ReversedLinesFileReader.java" target-dir="src/org/apache/commons/io/input" />
+        <source-file src="android/common/src/main/java/org/chromium/content/browser/ThreadUtils.java" target-dir="src/org/chromium/content/browser" />
         <source-file src="android/common/src/main/java/ru/andremoniy/sqlbuilder/SqlExpression.java" target-dir="src/ru/andremoniy/sqlbuilder" />
         <source-file src="android/common/src/main/java/ru/andremoniy/sqlbuilder/SqlSelectStatement.java" target-dir="src/ru/andremoniy/sqlbuilder" />
         <source-file src="android/common/src/main/java/ru/andremoniy/sqlbuilder/SqlStatement.java" target-dir="src/ru/andremoniy/sqlbuilder" />
         <source-file src="android/common/src/main/java/ru/andremoniy/utils/TextUtils.java" target-dir="src/ru/andremoniy/utils" />
+        <source-file src="android/common/src/oreo/java/com/marianhello/bgloc/BootCompletedReceiver.java" target-dir="src/com/marianhello/bgloc" />
         <source-file src="android/common/src/oreo/java/com/marianhello/bgloc/NotificationHelper.java" target-dir="src/com/marianhello/bgloc" />
         <source-file src="android/common/src/oreo/java/com/marianhello/bgloc/sync/SyncAdapter.java" target-dir="src/com/marianhello/bgloc/sync" />
         <!-- End of generated sources -->
@@ -250,7 +254,7 @@
         <framework src="AudioToolbox.framework" weak="true" />
         <framework src="AVFoundation.framework" weak="true" />
         <framework src="libsqlite3.dylib" weak="true" />
-        <!-- Generated with gen_sources.sh @ 2018-04-30 17:38:27 -->
+        <!-- Generated with gen_sources.sh @ 2018-05-22 13:19:11 -->
         <header-file src="ios/CDVBackgroundGeolocation/CDVBackgroundGeolocation.h" />
         <source-file src="ios/CDVBackgroundGeolocation/CDVBackgroundGeolocation.m" />
         <header-file src="ios/common/BackgroundGeolocation/CocoaLumberjack.h" />
@@ -259,6 +263,16 @@
         <source-file src="ios/common/BackgroundGeolocation/FMDB.m" />
         <header-file src="ios/common/BackgroundGeolocation/FMDBLogger.h" />
         <source-file src="ios/common/BackgroundGeolocation/FMDBLogger.m" />
+        <header-file src="ios/common/BackgroundGeolocation/INTULocationManager/INTUHeadingRequest.h" />
+        <source-file src="ios/common/BackgroundGeolocation/INTULocationManager/INTUHeadingRequest.m" />
+        <header-file src="ios/common/BackgroundGeolocation/INTULocationManager/INTULocationManager+Internal.h" />
+        <header-file src="ios/common/BackgroundGeolocation/INTULocationManager/INTULocationManager.h" />
+        <source-file src="ios/common/BackgroundGeolocation/INTULocationManager/INTULocationManager.m" />
+        <header-file src="ios/common/BackgroundGeolocation/INTULocationManager/INTULocationRequest.h" />
+        <source-file src="ios/common/BackgroundGeolocation/INTULocationManager/INTULocationRequest.m" />
+        <header-file src="ios/common/BackgroundGeolocation/INTULocationManager/INTULocationRequestDefines.h" />
+        <header-file src="ios/common/BackgroundGeolocation/INTULocationManager/INTURequestIDGenerator.h" />
+        <source-file src="ios/common/BackgroundGeolocation/INTULocationManager/INTURequestIDGenerator.m" />
         <header-file src="ios/common/BackgroundGeolocation/MAURAbstractLocationProvider.h" />
         <source-file src="ios/common/BackgroundGeolocation/MAURAbstractLocationProvider.m" />
         <header-file src="ios/common/BackgroundGeolocation/MAURActivity.h" />
@@ -283,8 +297,8 @@
         <source-file src="ios/common/BackgroundGeolocation/MAURLocation.m" />
         <header-file src="ios/common/BackgroundGeolocation/MAURLocationContract.h" />
         <source-file src="ios/common/BackgroundGeolocation/MAURLocationContract.m" />
-        <header-file src="ios/common/BackgroundGeolocation/MAURLocationController.h" />
-        <source-file src="ios/common/BackgroundGeolocation/MAURLocationController.m" />
+        <header-file src="ios/common/BackgroundGeolocation/MAURLocationManager.h" />
+        <source-file src="ios/common/BackgroundGeolocation/MAURLocationManager.m" />
         <header-file src="ios/common/BackgroundGeolocation/MAURLogReader.h" />
         <source-file src="ios/common/BackgroundGeolocation/MAURLogReader.m" />
         <header-file src="ios/common/BackgroundGeolocation/MAURLogging.h" />
