@@ -51,6 +51,9 @@ More info: https://github.com/mauron85/react-native-background-geolocation/pull/
 Since alpha.46:
 - typescript definitions
 
+Since alpha.47:
+- allow nested location props in postTemplate
+
 #### Changed
 - start and stop methods doesn't accept callback (use event listeners instead)
 - for background syncing syncUrl option is required

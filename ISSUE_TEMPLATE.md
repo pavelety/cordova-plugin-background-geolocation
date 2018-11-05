@@ -9,6 +9,8 @@
 * Platform: iOS or Android
 * OS version:
 * Device manufacturer and model:
+<!--- If Simulator was used instead of real device, type Yes in following section -->
+* Running in Simulator:
 * Cordova version (`cordova -v`):
 * Cordova platform version (`cordova platform ls`):
 * Plugin configuration options: 

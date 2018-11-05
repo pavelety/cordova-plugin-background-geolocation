@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-pavelety-background-geolocation",
-  "version": "3.0.0-alpha.46",
+  "version": "3.0.0-alpha.47",
   "description": "Cordova Background Geolocation Plugin",
   "main": "www/BackgroundGeolocation.js",
   "cordova": {
