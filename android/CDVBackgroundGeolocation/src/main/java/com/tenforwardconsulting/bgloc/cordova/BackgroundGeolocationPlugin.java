@@ -14,7 +14,6 @@ package com.tenforwardconsulting.bgloc.cordova;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.marianhello.bgloc.BackgroundGeolocationFacade;
@@ -381,6 +380,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Plugin
 
     private void start() {
         facade.start();
+        BatteryOptimization.ignore(getContext());
     }
 
     /**
@@ -603,46 +603,5 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Plugin
     @Override
     public void onError(PluginException e) {
         sendError(e);
-    }
-
-    public boolean hasPermissions() {
-        boolean has = facade.hasPermissions();
-        if (!has) {
-            logger.debug("Permissions not granted");
-            cordova.requestPermissions(this, PERMISSIONS_REQUEST_CODE, BackgroundGeolocationFacade.PERMISSIONS);
-        } else {
-            BatteryOptimization.ignore(getContext());
-        }
-        return has;
-    }
-
-    @Override
-    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_CODE: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length == 0) {
-                    // permission denied
-                    logger.info("User denied requested permissions");
-                    onAuthorizationChanged(BackgroundGeolocationFacade.AUTHORIZATION_DENIED);
-                    return;
-                }
-                for (int grant : grantResults) {
-                    if (grant != PackageManager.PERMISSION_GRANTED) {
-                        // permission denied
-                        logger.info("User denied requested permissions");
-                        onAuthorizationChanged(BackgroundGeolocationFacade.AUTHORIZATION_DENIED);
-                        return;
-                    }
-                }
-
-                // permission was granted
-                // start service
-                logger.info("User granted requested permissions");
-                facade.start();
-                BatteryOptimization.ignore(getContext());
-                return;
-            }
-        }
     }
 }
